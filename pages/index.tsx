@@ -1,10 +1,11 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { Layout } from './components/Layout';
-import { Dashboard } from './views/Dashboard';
-import { Inventory } from './views/Inventory';
-import { Customers } from './views/Customers';
-import { Product, Customer, Transaction, KiranaState } from './types';
+import Head from 'next/head';
+import { Layout } from '../components/Layout';
+import { Dashboard } from '../views/Dashboard';
+import { Inventory } from '../views/Inventory';
+import { Customers } from '../views/Customers';
+import { Product, Customer, Transaction, KiranaState } from '../types';
 
 const INITIAL_STATE: KiranaState = {
   products: [
@@ -19,24 +20,31 @@ const INITIAL_STATE: KiranaState = {
   transactions: []
 };
 
-const App: React.FC = () => {
+export default function HomePage() {
   const [activeTab, setActiveTab] = useState<'dashboard' | 'inventory' | 'customers'>('dashboard');
   const [viewMode, setViewMode] = useState<'shopkeeper' | 'customer'>('shopkeeper');
-  const [state, setState] = useState<KiranaState>(() => {
-    const saved = localStorage.getItem('kirana_data');
-    return saved ? JSON.parse(saved) : INITIAL_STATE;
-  });
+  const [state, setState] = useState<KiranaState>(INITIAL_STATE);
+  const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
-    localStorage.setItem('kirana_data', JSON.stringify(state));
-  }, [state]);
+    const saved = localStorage.getItem('kirana_data');
+    if (saved) {
+      setState(JSON.parse(saved));
+    }
+    setIsLoaded(true);
+  }, []);
 
-  // If switched to customer mode, force to customers tab (bill view)
+  useEffect(() => {
+    if (isLoaded) {
+      localStorage.setItem('kirana_data', JSON.stringify(state));
+    }
+  }, [state, isLoaded]);
+
   useEffect(() => {
     if (viewMode === 'customer' && activeTab !== 'customers') {
       setActiveTab('customers');
     }
-  }, [viewMode]);
+  }, [viewMode, activeTab]);
 
   const addProduct = useCallback((product: Omit<Product, 'id'>) => {
     const newProduct = { ...product, id: Math.random().toString(36).substr(2, 9) };
@@ -81,37 +89,43 @@ const App: React.FC = () => {
     });
   }, []);
 
-  return (
-    <Layout 
-      activeTab={activeTab} 
-      setActiveTab={setActiveTab} 
-      viewMode={viewMode} 
-      setViewMode={setViewMode}
-    >
-      {activeTab === 'dashboard' && viewMode === 'shopkeeper' && (
-        <Dashboard 
-          state={state} 
-          onAddTransaction={recordTransaction} 
-        />
-      )}
-      {activeTab === 'inventory' && viewMode === 'shopkeeper' && (
-        <Inventory 
-          products={state.products} 
-          onAddProduct={addProduct} 
-        />
-      )}
-      {activeTab === 'customers' && (
-        <Customers 
-          customers={state.customers} 
-          transactions={state.transactions}
-          products={state.products}
-          onAddCustomer={addCustomer}
-          onAddTransaction={recordTransaction}
-          isShopkeeper={viewMode === 'shopkeeper'}
-        />
-      )}
-    </Layout>
-  );
-};
+  if (!isLoaded) return <div className="min-h-screen bg-slate-50 flex items-center justify-center font-bold text-slate-400">Loading Khata...</div>;
 
-export default App;
+  return (
+    <>
+      <Head>
+        <title>KiranaKhata - Smart Digital Ledger</title>
+        <meta name="description" content="Manage your kirana shop inventory and customer credit efficiently." />
+      </Head>
+      <Layout 
+        activeTab={activeTab} 
+        setActiveTab={setActiveTab} 
+        viewMode={viewMode} 
+        setViewMode={setViewMode}
+      >
+        {activeTab === 'dashboard' && viewMode === 'shopkeeper' && (
+          <Dashboard 
+            state={state} 
+            onAddTransaction={recordTransaction} 
+          />
+        )}
+        {activeTab === 'inventory' && viewMode === 'shopkeeper' && (
+          <Inventory 
+            products={state.products} 
+            onAddProduct={addProduct} 
+          />
+        )}
+        {activeTab === 'customers' && (
+          <Customers 
+            customers={state.customers} 
+            transactions={state.transactions}
+            products={state.products}
+            onAddCustomer={addCustomer}
+            onAddTransaction={recordTransaction}
+            isShopkeeper={viewMode === 'shopkeeper'}
+          />
+        )}
+      </Layout>
+    </>
+  );
+}
