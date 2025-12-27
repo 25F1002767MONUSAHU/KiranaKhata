@@ -1,0 +1,7 @@
+{
+  "name": "Copy of KiranaKhata - Digital Shop Ledger",
+  "description": "A comprehensive digital ledger for Kirana shop owners to manage inventory, track customer credit (udhaar), and process payments. Features AI-powered list scanning to quickly add items from handwritten notes or printed bills.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
