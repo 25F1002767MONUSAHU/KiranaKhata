@@ -10,12 +10,15 @@ import { Product, Customer, Transaction, KiranaState } from '../types';
 const INITIAL_STATE: KiranaState = {
   products: [
     { id: '1', name: 'Basmati Rice 1kg', price: 120, category: 'Grains' },
-    { id: '2', name: 'Tata Salt 1kg', price: 25, category: 'Spices' },
-    { id: '3', name: 'Fortune Oil 1L', price: 185, category: 'Essentials' },
+    { id: '2', name: 'Tata Salt 1kg', price: 28, category: 'Spices' },
+    { id: '3', name: 'Fortune Soyabean Oil 1L', price: 165, category: 'Essentials' },
+    { id: '4', name: 'Aashirvaad Atta 5kg', price: 245, category: 'Grains' },
+    { id: '5', name: 'Amul Butter 100g', price: 58, category: 'Dairy' },
   ],
   customers: [
-    { id: 'c1', name: 'Rahul Sharma', phone: '9876543210', outstandingBalance: 450, lastUpdated: Date.now() },
+    { id: 'c1', name: 'Rahul Sharma', phone: '9876543210', outstandingBalance: 1250, lastUpdated: Date.now() },
     { id: 'c2', name: 'Priya Verma', phone: '9123456780', outstandingBalance: 0, lastUpdated: Date.now() },
+    { id: 'c3', name: 'Amit Gupta', phone: '9988776655', outstandingBalance: 450, lastUpdated: Date.now() },
   ],
   transactions: []
 };
@@ -27,16 +30,20 @@ export default function HomePage() {
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
-    const saved = localStorage.getItem('kirana_data');
+    const saved = localStorage.getItem('kirana_data_v2');
     if (saved) {
-      setState(JSON.parse(saved));
+      try {
+        setState(JSON.parse(saved));
+      } catch (e) {
+        console.error("Failed to parse local storage", e);
+      }
     }
     setIsLoaded(true);
   }, []);
 
   useEffect(() => {
     if (isLoaded) {
-      localStorage.setItem('kirana_data', JSON.stringify(state));
+      localStorage.setItem('kirana_data_v2', JSON.stringify(state));
     }
   }, [state, isLoaded]);
 
@@ -89,13 +96,19 @@ export default function HomePage() {
     });
   }, []);
 
-  if (!isLoaded) return <div className="min-h-screen bg-slate-50 flex items-center justify-center font-bold text-slate-400">Loading Khata...</div>;
+  if (!isLoaded) return (
+    <div className="min-h-screen bg-slate-900 flex flex-col items-center justify-center text-white">
+      <div className="w-16 h-16 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+      <h1 className="text-xl font-black tracking-tighter">KIRANA KHATA</h1>
+      <p className="text-slate-400 text-sm">Opening your shop...</p>
+    </div>
+  );
 
   return (
     <>
       <Head>
-        <title>KiranaKhata - Smart Digital Ledger</title>
-        <meta name="description" content="Manage your kirana shop inventory and customer credit efficiently." />
+        <title>KiranaKhata | Digital Shop Ledger</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
       </Head>
       <Layout 
         activeTab={activeTab} 
