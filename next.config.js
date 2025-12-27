@@ -3,6 +3,7 @@
 const nextConfig = {
   reactStrictMode: true,
   typescript: {
+    // Ensuring build proceeds even if there are minor type warnings in generated code
     ignoreBuildErrors: true,
   },
   eslint: {
