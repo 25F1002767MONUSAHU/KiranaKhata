@@ -1,7 +1,7 @@
 {
-  "name": "KiranaKhata Pro",
-  "description": "Premium Digital Ledger for Shopkeepers and Customers. Manage inventory, track Udhaar, and scan lists with AI.",
   "requestFramePermissions": [
     "camera"
-  ]
+  ],
+  "name": "",
+  "description": ""
 }
